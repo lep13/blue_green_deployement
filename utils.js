@@ -24,8 +24,35 @@ async function getFileWithDefaults(file, defaultFile) {
   return JSON.parse(data);
 }
 
+// async function getConfig() {
+//   return getFileWithDefaults(configPath, defaultConfigPath);
+// }
+
 async function getConfig() {
-  return getFileWithDefaults(configPath, defaultConfigPath);
+  // Always load the default config first
+  const defaultData = await fs.readFileAsync(defaultConfigPath, "utf-8");
+  const defaultConfig = JSON.parse(defaultData);
+
+  // Check if the dist config exists, if not use default
+  let configExists = false;
+  try {
+    await fs.accessAsync(configPath, fs.constants.F_OK);
+    configExists = true;
+  } catch (err) {
+    configExists = false;
+  }
+
+  if (configExists) {
+    // If dist config exists, merge it with default config
+    const configData = await fs.readFileAsync(configPath, "utf-8");
+    const distConfig = JSON.parse(configData);
+
+    // Merge dist config with default config to apply any changes
+    return [Object.assign({}, defaultConfig, distConfig)];
+  }
+
+  // If dist config doesn't exist, return default config
+  return [defaultConfig];
 }
 
 async function getBlog() {

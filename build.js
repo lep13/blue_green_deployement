@@ -58,9 +58,19 @@ async function populateCSS({
   await fs.writeFileAsync(config, JSON.stringify(data, null, " "));
 }
 
+// async function populateConfig(opts) {
+//   const data = await getConfig();
+//   Object.assign(data[0], opts);
+//   await fs.writeFileAsync(config, JSON.stringify(data, null, " "));
+// }
+
 async function populateConfig(opts) {
-  const data = await getConfig();
+  const data = await getConfig(); // This pulls from default config if no dist config exists
+  
+  // Merge any new values (opts) into the default config
   Object.assign(data[0], opts);
+  
+  // Write the merged config back to the dist config.json
   await fs.writeFileAsync(config, JSON.stringify(data, null, " "));
 }
 
